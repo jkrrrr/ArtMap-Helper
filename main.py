@@ -20,27 +20,31 @@ class item:
 
 
 def main():
-    print("Starting")
+    # Create logger
     logging.basicConfig(filename="file.log",
                    format="%(asctime)s %(message)s",
                    filemode="w")
     logger = logging.getLogger()
-
     logger.setLevel(logging.INFO)
     
+    # fileName is the spreadsheet containing all the colour information
     fileName="colour_info.xlsx"
 
+    logger.info("Reading spreadsheet %s", fileName)
     try:
         excel = pd.read_excel(fileName)
     except:
         logger.error("%s could not be found", fileName)
         sys.exit()
-    logger.info("Read excel file %s", fileName)
 
+    # Create an array of items. Each item holds its name, along with the four colours it can produce (as an RGB tuple)
     logger.info("Creating items")
     colours = []
     for index, row in excel.iterrows():
         colours.append(item(row[0], row[1], row[2], row[3], row[4]))
+
+
+    
 
 if __name__ == '__main__':
     main()
