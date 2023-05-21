@@ -1,5 +1,6 @@
 import logging
 import sys
+import math
 
 import numpy as np
 import pandas as pd
@@ -14,15 +15,16 @@ def get_diff(a: int, b: int):
         return a - b
     return b - a
 
+# Calculates the Euclidean distance between two tuples 
 def get_diff_tuple(a, b):
-    x = get_diff(a[0], b[0])
-    y = get_diff(a[1], b[1])
-    z = get_diff(a[2], a[2])
-
-    return (x, y, z)
+    toReturn = math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b))) 
+    return toReturn
 
 def get_tuple_avg(a):
     return sum(map(float, filter(None, a[:])))/3
+
+def compare_tuple(a, b):
+    return True
 
 class Item:
     def __init__(self, name, colour1, colour2, colour3, colour4):
@@ -45,17 +47,13 @@ class Item:
         colour2Diff = get_diff_tuple(self.colour2, colour)
         colour3Diff = get_diff_tuple(self.colour3, colour)
 
-        colour1Avg = get_tuple_avg(colour1Diff)
-        colour2Avg = get_tuple_avg(colour2Diff)
-        colour3Avg = get_tuple_avg(colour3Diff)
+#        colour1Avg = get_tuple_avg(colour1Diff)
+#        colour2Avg = get_tuple_avg(colour2Diff)
+#        colour3Avg = get_tuple_avg(colour3Diff)
 
-        lowestAvg = min(colour1Avg, colour2Avg, colour3Avg)
+        closestColour, closestDiff = min([(self.colour1, colour1Diff), (self.colour2, colour2Diff), (self.colour3, colour3Diff)], key=lambda x: x[1])
+        return closestDiff, closestColour
 
-        if colour1Avg == lowestAvg:
-            return lowestAvg, self.colour1
-        if colour2Avg == lowestAvg:
-            return lowestAvg, self.colour2
-        return lowestAvg, self.colour3
 
 
 class Comparison:
@@ -101,7 +99,7 @@ def main():
     
     # Resize to fit onto the canvas. Currently, we only support a single canvas (32x32)
     canvasSize = (32,32)
-    image.thumbnail(canvasSize, Image.ANTIALIAS)
+#    image.thumbnail(canvasSize, Image.ANTIALIAS)
     logger.info(f"Resizing image to {image.size}")
 
     image.save("out.png") # TODO: remove in production
