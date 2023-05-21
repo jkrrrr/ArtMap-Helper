@@ -3,7 +3,8 @@ import sys
 
 import numpy as np
 import pandas as pd
-from PIL import Image, ImageSequence
+from PIL import Image
+import matplotlib.pyplot as plt
 
 
 def get_diff(a: int, b: int):
@@ -113,7 +114,6 @@ def main():
     # Compare pixels to colour
     pixelComparisons = {}
     for i in range(len(imageData)):
-        logger.info(f"Currently at {i}")
         currentBestDiff = 255
         currentBestColour = Comparison('None', 'None')
         for item in colours:
@@ -127,12 +127,14 @@ def main():
 
     
     # Create new image
+    logger.info("Creating preview image")
     imageNewArr = []
     for i in pixelComparisons:
-        imageNewArr.append(i.colour)
+        imageNewArr.append(pixelComparisons[i].colour)
 
-    imageNew = Image.fromarray(imageNewArr)
-    imageNew.save("newimage.png")
+    previewImage = Image.new("RGB", image.size)
+    previewImage.putdata(imageNewArr)
+    previewImage.save("preview.png")
 
 
 if __name__ == '__main__':
