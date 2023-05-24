@@ -1,11 +1,11 @@
 import logging
-import sys
 import math
+import sys
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from PIL import Image
-import matplotlib.pyplot as plt
 
 
 def get_diff(a: int, b: int):
@@ -88,7 +88,7 @@ def main():
 
     
     # Read image
-    imageName = "test.png"
+    imageName = "image.png"
     logger.info("Accessing image %s", imageName)
     try:
         image = Image.open(imageName).convert('RGB')
@@ -99,10 +99,8 @@ def main():
     
     # Resize to fit onto the canvas. Currently, we only support a single canvas (32x32)
     canvasSize = (32,32)
-#    image.thumbnail(canvasSize, Image.ANTIALIAS)
+    image.thumbnail(canvasSize, Image.ANTIALIAS)
     logger.info(f"Resizing image to {image.size}")
-
-    image.save("out.png") # TODO: remove in production
 
     logger.info("Getting pixel data")
     # For each pixel, we need to find the closest-matching RGB from the items. There's probably a more efficient way of doing it.
