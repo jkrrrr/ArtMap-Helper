@@ -8,7 +8,7 @@ This tool takes an image, and outputs a 32x32 (aspect ratio is maintained, so im
 
 Colours are stored as an Excel database, so the application will not work without one. The default ArtMap can be found with the .exe in the releases page, and can be of course modified as you wish, as long as you follow the correct format (which can be found through examples in the spreadsheet).
 
-Simply put the spreadsheet in the same directory as the .exe in order to use it.
+Simply name the spreadsheet `colour_info.xlsx` and put it in the same directory as the .exe in order to use it.
 
 # Usage
 
