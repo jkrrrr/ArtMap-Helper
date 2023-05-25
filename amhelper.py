@@ -60,7 +60,7 @@ class Comparison:
 
 
 def read_colours(file_name: str):
-    
+    print("Reading colours")
     try:
         global excel
         excel = pd.read_excel(file_name)
@@ -97,6 +97,7 @@ def get_preview():
     for i in range(len(imageData)):
         currentBestDiff = 255
         currentBestColour = Comparison('None', 'None')
+        global colours
         for item in colours:
             currentAvg, currentColour = item.closest_colour(imageData[i])
             if currentAvg < currentBestDiff:
@@ -112,3 +113,5 @@ def get_preview():
     previewImage = Image.new("RGB", image.size)
     previewImage.putdata(imageNewArr)
     previewImage.save("preview.png")
+
+    return previewImage

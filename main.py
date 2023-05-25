@@ -1,5 +1,7 @@
 import amhelper as amh
 
+import logging
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -37,6 +39,7 @@ def init_window():
 def get_file():
     global image
     file_path = filedialog.askopenfilename()
+    amh.read_image(file_path)
     if file_path:
         image = Image.open(file_path)
         width = 300
@@ -45,14 +48,23 @@ def get_file():
         image = image.resize((width, height))
         render = ImageTk.PhotoImage(image)
         print(file_path)
+        imageWidget.configure(image=render)
         imageWidget.image = render
         imageWidget.place(x=0, y=0)
 
+def get_artmap():
+    preview = amh.get_preview()
+    width = 300
+    width_ratio = width/preview.width
+    height = int(preview.height * width_ratio)
+    preview = preview.resize((width, height), resample=Image.NEAREST)
+    render = ImageTk.PhotoImage(preview)
+    previewWidget.configure(image=render)
+    previewWidget.image = render
+
+
 def init_widgets(window):
     ttk.Frame(window, padding=10)
-
-    button = ttk.Button(window, text="This is a button!", command=button_click)
-    button.pack()
 
     button = ttk.Button(window, text="Select image from file", command=get_file)
     button.pack()
@@ -61,12 +73,33 @@ def init_widgets(window):
     imageWidget = ttk.Label(window)
     imageWidget.pack()
 
+    button = ttk.Button(window, text="Calculate ArtMap", command=get_artmap)
+    button.pack()
+
+    global previewWidget
+    previewWidget = ttk.Label(window)
+    previewWidget.pack()
+
 def main():
+    # Create logger
+    logging.basicConfig(filename="file.log",
+                        format="%(asctime)s %(message)s",
+                        filemode="w")
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    # Read colours
+    amh.read_colours("colour_info.xlsx")
+
+    logger.info("Creating window")
     window = init_window()
 
+    logger.info("Intializing window")
     init_widgets(window)
 
+    logger.info("Starting window main loop")
     window.mainloop()
+
 
 
 
