@@ -120,22 +120,5 @@ def main():
     logger.info("Starting window main loop")
     window.mainloop()
 
-    logger.info("Getting pixel data")
-    # For each pixel, we need to find the closest-matching RGB from the items. There's probably a more efficient way of doing it.
-    imageData = list(image.getdata())
-    logger.info(imageData)
-            
-    # Compare pixels to colour
-    pixelComparisons = {}
-    for i in range(len(imageData)):
-        currentBestDiff = 255
-        currentBestColour = Comparison('None', 'None')
-        for item in colours:
-            currentAvg, currentColour = item.closest_colour(imageData[i])
-            if currentAvg < currentBestDiff:
-                currentBestDiff = currentAvg
-                currentBestColour = Comparison(item.name, currentColour)
-        pixelComparisons[i] = currentBestColour
-
 if __name__ == "__main__":
     main()
