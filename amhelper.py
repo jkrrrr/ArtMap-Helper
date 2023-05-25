@@ -112,6 +112,6 @@ def get_preview():
 
     previewImage = Image.new("RGB", image.size)
     previewImage.putdata(imageNewArr)
-    previewImage.save("preview.png")
+#    previewImage.save("preview.png")
 
     return previewImage

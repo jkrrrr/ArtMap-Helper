@@ -18,6 +18,7 @@ def init_window():
 
     window.title("Art Map Helper")
 
+
     # Center window and define width and height
     window_width = 900
     window_height = 500
@@ -53,6 +54,7 @@ def get_file():
         imageWidget.place(x=0, y=0)
 
 def get_artmap():
+    global preview
     preview = amh.get_preview()
     width = 300
     width_ratio = width/preview.width
@@ -61,6 +63,11 @@ def get_artmap():
     render = ImageTk.PhotoImage(preview)
     previewWidget.configure(image=render)
     previewWidget.image = render
+
+def save_to_file():
+    file_path = filedialog.asksaveasfile(mode='w', defaultextension=".png", filetypes=[("All files", "*.*"), ("PNG", "*.png")], title="Save image")
+    if file_path and preview:
+        preview.save(file_path.name)
 
 
 def init_widgets(window):
@@ -71,14 +78,17 @@ def init_widgets(window):
 
     global imageWidget
     imageWidget = ttk.Label(window)
-    imageWidget.pack()
+    imageWidget.pack(anchor=tk.W)
 
     button = ttk.Button(window, text="Calculate ArtMap", command=get_artmap)
     button.pack()
 
     global previewWidget
     previewWidget = ttk.Label(window)
-    previewWidget.pack()
+    previewWidget.pack(anchor=tk.E)
+
+    saveButton = ttk.Button(window, text="Save to file", command=save_to_file)
+    saveButton.pack(anchor=tk.S)
 
 def main():
     # Create logger
