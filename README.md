@@ -5,6 +5,7 @@ ArtMap is a Minecraft server plugin that allows players to paint on 32x32 canvas
 This tool takes an image (image.png), and outputs a 32x32 (aspect ratio is maintained, so image might not always be 32x32, but will definitly be 32x[something]) image that conforms to the colour restrictions.
 
 # Usage
-1. Have the input image in the working directory named `"image.png"`
-2. Run `main.py`
-3. The output image will be named `preview.png`
+
+1. Select the file using the button "Select image from file"
+2. Convert the image into an artmap with the button "Calculate ArtMap"
+3. Save the image to a file with the button at the bottom labelled "Save to file"
