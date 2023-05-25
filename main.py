@@ -1,106 +1,124 @@
+import amhelper as amh
+
 import logging
-import math
 import sys
+import math
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from PIL import Image
+import tkinter as tk
+from tkinter import ttk
+from tkinter import filedialog
 
+from PIL import ImageTk, Image
 
-def get_diff(a: int, b: int):
-    a = int(a)
-    b = int(b)
-    if a > b:
-        return a - b
-    return b - a
+file_path = ""
 
-# Calculates the Euclidean distance between two tuples 
-def get_diff_tuple(a, b):
-    toReturn = math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b))) 
-    return toReturn
+# Function to initialize the tkinter window
+def init_window():
+    window = tk.Tk()
 
-def get_tuple_avg(a):
-    return sum(map(float, filter(None, a[:])))/3
+    window.title("Art Map Helper")
 
-def compare_tuple(a, b):
-    return True
+    # Center window and define width and height
+    window_width = 900
+    window_height = 500
 
-class Item:
-    def __init__(self, name, colour1, colour2, colour3, colour4):
-        self.name = name
-        self.colour1 = self.seperate_RGB(colour1)
-        self.colour2 = self.seperate_RGB(colour2)
-        self.colour3 = self.seperate_RGB(colour3)
-        self.colour4 = self.seperate_RGB(colour4)
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
 
-    def seperate_RGB(self, rgb):
-        separate = rgb.split(',')      
-        red = int(separate[0][4:])
-        green = int(separate[1][1:])
-        blue = int(separate[2][1:-1])
+    center_x = int(screen_width/2 - window_width/2)
+    center_y = int(screen_height/2 - window_height/2)
+     
+    window.geometry(f"{window_width}x{window_height}+{center_x}+{center_y}")
+    window.resizable(False, False)
 
-        return (red, green, blue)
+    return window
 
-    def closest_colour(self, colour):
-        colour1Diff = get_diff_tuple(self.colour1, colour)
-        colour2Diff = get_diff_tuple(self.colour2, colour)
-        colour3Diff = get_diff_tuple(self.colour3, colour)
+# Button function: gets an image and renders it in a label widget
+def get_file():
+    global image
+    # Ask the user to select a file
+    file_path = filedialog.askopenfilename()
+    amh.read_image(file_path)
+    if file_path:
+        # Open file as an image
+        image = Image.open(file_path)
+        # Scale the image while keeping its aspect ratio
+        width = 300
+        width_ratio = width/image.width
+        height = int(image.height * width_ratio)
+        image = image.resize((width, height))
+        # Prepare image for render
+        render = ImageTk.PhotoImage(image)
+        imageWidget.configure(image=render)
+        imageWidget.image = render
+        imageWidget.place(x=0, y=0)
 
-#        colour1Avg = get_tuple_avg(colour1Diff)
-#        colour2Avg = get_tuple_avg(colour2Diff)
-#        colour3Avg = get_tuple_avg(colour3Diff)
+# Button function: converts the image into an artmap and renders it
+def get_artmap():
+    global preview
+    preview = amh.get_preview()
+    width = 200
+    width_ratio = width/preview.width
+    height = int(preview.height * width_ratio)
+    preview = preview.resize((width, height), resample=Image.NEAREST) # Image.NEAREST is used, as by default, antialiasing is applied, which we don't want with pixel art
+    render = ImageTk.PhotoImage(preview)
+    previewWidget.configure(image=render)
+    previewWidget.image = render
 
-        closestColour, closestDiff = min([(self.colour1, colour1Diff), (self.colour2, colour2Diff), (self.colour3, colour3Diff)], key=lambda x: x[1])
-        return closestDiff, closestColour
+# Button function: saves the preview produce by get_artmap() into a file
+def save_to_file():
+    file_path = filedialog.asksaveasfile(mode='w', defaultextension=".png", filetypes=[("PNG", "*.png"), ("All files", "*.*")], title="Save image")
+    if file_path and preview:
+        preview.save(file_path.name)
 
+# Initialize window widgets
+def init_widgets(window):
+    ttk.Frame(window)
 
+    # Select the image from a file
+    button = ttk.Button(window, text="Select image from file", command=get_file)
+    button.pack(fill=tk.Y)
 
-class Comparison:
-    def __init__(self, item, colour):
-        self.item = item
-        self.colour = colour
+    # Displays the selected image
+    global imageWidget
+    imageWidget = ttk.Label(window)
+    imageWidget.pack(anchor=tk.W)
 
+    # Calculates the artmap of that image
+    button = ttk.Button(window, text="Calculate ArtMap", command=get_artmap)
+    button.pack(anchor=tk.N, side=tk.TOP)
+
+    # Displays the artmap
+    global previewWidget
+    previewWidget = ttk.Label(window)
+    previewWidget.pack()
+
+    # Save the artmap as a file
+    saveButton = ttk.Button(window, text="Save to file", command=save_to_file)
+    saveButton.pack(anchor=tk.S, side=tk.BOTTOM, fill=tk.X)
 
 def main():
     # Create logger
     logging.basicConfig(filename="file.log",
-                   format="%(asctime)s %(message)s",
-                   filemode="w")
+                        format="%(asctime)s %(message)s",
+                        filemode="w")
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     
     # fileName is the spreadsheet containing all the colour information
     fileName="colour_info.xlsx"
 
-    logger.info(f"Reading spreadsheet {fileName}")
-    try:
-        excel = pd.read_excel(fileName)
-    except:
-        logger.error(f"{fileName} could not be found")
-        sys.exit()
+    # Read colours
+    amh.read_colours("colour_info.xlsx")
 
-    # Create an array of items. Each item holds its name, along with the four colours it can produce (as an RGB tuple)
-    logger.info("Creating items")
-    colours = []
-    for index, row in excel.iterrows():
-        colours.append(Item(row[0], row[1], row[2], row[3], row[4]))
+    logger.info("Creating window")
+    window = init_window()
 
-    
-    # Read image
-    imageName = "image.png"
-    logger.info("Accessing image %s", imageName)
-    try:
-        image = Image.open(imageName).convert('RGB')
-    except:
-        logger.error(f"Unable to open image {imageName}")
-        sys.exit()
-    logger.info(f"Image is of shape {image.size}")
-    
-    # Resize to fit onto the canvas. Currently, we only support a single canvas (32x32)
-    canvasSize = (32,32)
-    image.thumbnail(canvasSize, Image.ANTIALIAS)
-    logger.info(f"Resizing image to {image.size}")
+    logger.info("Intializing window")
+    init_widgets(window)
+
+    logger.info("Starting window main loop")
+    window.mainloop()
 
     logger.info("Getting pixel data")
     # For each pixel, we need to find the closest-matching RGB from the items. There's probably a more efficient way of doing it.
@@ -119,19 +137,5 @@ def main():
                 currentBestColour = Comparison(item.name, currentColour)
         pixelComparisons[i] = currentBestColour
 
-    logger.info(f"Comparisons completed, length {len(pixelComparisons)}")
-
-    
-    # Create new image
-    logger.info("Creating preview image")
-    imageNewArr = []
-    for i in pixelComparisons:
-        imageNewArr.append(pixelComparisons[i].colour)
-
-    previewImage = Image.new("RGB", image.size)
-    previewImage.putdata(imageNewArr)
-    previewImage.save("preview.png")
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
