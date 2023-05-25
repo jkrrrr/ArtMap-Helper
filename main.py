@@ -10,9 +10,6 @@ from PIL import ImageTk, Image
 
 file_path = ""
 
-def button_click():
-    print("THE BUTTON HAS BEEN CLICKED")
-
 def init_window():
     window = tk.Tk()
 
@@ -56,7 +53,7 @@ def get_file():
 def get_artmap():
     global preview
     preview = amh.get_preview()
-    width = 300
+    width = 200
     width_ratio = width/preview.width
     height = int(preview.height * width_ratio)
     preview = preview.resize((width, height), resample=Image.NEAREST)
@@ -65,30 +62,30 @@ def get_artmap():
     previewWidget.image = render
 
 def save_to_file():
-    file_path = filedialog.asksaveasfile(mode='w', defaultextension=".png", filetypes=[("All files", "*.*"), ("PNG", "*.png")], title="Save image")
+    file_path = filedialog.asksaveasfile(mode='w', defaultextension=".png", filetypes=[("PNG", "*.png"), ("All files", "*.*")], title="Save image")
     if file_path and preview:
         preview.save(file_path.name)
 
 
 def init_widgets(window):
-    ttk.Frame(window, padding=10)
+    ttk.Frame(window)
 
     button = ttk.Button(window, text="Select image from file", command=get_file)
-    button.pack()
+    button.pack(fill=tk.Y)
 
     global imageWidget
     imageWidget = ttk.Label(window)
     imageWidget.pack(anchor=tk.W)
 
     button = ttk.Button(window, text="Calculate ArtMap", command=get_artmap)
-    button.pack()
+    button.pack(anchor=tk.N, side=tk.TOP)
 
     global previewWidget
     previewWidget = ttk.Label(window)
-    previewWidget.pack(anchor=tk.E)
+    previewWidget.pack()
 
     saveButton = ttk.Button(window, text="Save to file", command=save_to_file)
-    saveButton.pack(anchor=tk.S)
+    saveButton.pack(anchor=tk.S, side=tk.BOTTOM, fill=tk.X)
 
 def main():
     # Create logger
