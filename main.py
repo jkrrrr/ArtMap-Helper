@@ -56,7 +56,7 @@ def get_file():
 # Button function: converts the image into an artmap and renders it
 def get_artmap():
     global preview
-    preview = amh.get_preview()
+    preview = amh.get_preview((4,3)) # Get the artmap that fits into a size (x,y)
     width = 200
     width_ratio = width/preview.width
     height = int(preview.height * width_ratio)

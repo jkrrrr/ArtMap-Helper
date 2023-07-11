@@ -84,10 +84,11 @@ def read_image(file_name: str):
         return False
         
   
-def get_preview():
-    # Resize to fit onto the canvas. Currently, we only support a single canvas (32x32)
-    canvasSize = (32,32)
+def get_preview(size: tuple):
+    # Resize to fit onto the canvas. 
+    canvasSize = (size[0]*32, size[1]*32)
     image.thumbnail(canvasSize, Image.ANTIALIAS)
+    print(image.size)
 
     # For each pixel, we need to find the closest-matching RGB from the items. There's probably a more efficient way of doing it.
     imageData = list(image.getdata())
